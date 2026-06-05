@@ -24,6 +24,13 @@ Planned features:
 - Multiple targets
 - Troubleshooting output
 
+## Day 3 Goal
+
+Support multiple target URLs from config.json
+
+The tool currently checks one URL per run. Day 3 should upgrade the config so it can store a list of target URLs, then use a 'for' loop in 'main()' to check each target, write each result to 'logs/monitor.log', and print a short summary for each check.
+
+
 ## Run
 
 ```zsh
