@@ -10,7 +10,7 @@ def load_config(): #Reads config settings
 def check_website(url, timeout): #Defines website check, allowed by main function
     try: #Attempts get request, checks website health with max timeout of 5 sec
         response = requests.get(url, timeout=timeout) 
-        
+
         if response.status_code==200: #If response returns status code = 200 = healthy
             healthy = True
         else:
@@ -57,9 +57,12 @@ def write_log(entry):
 
 def main(): #controls program flow
     config = load_config() #Allows config to be read
-    entry = check_website(config["target_url"], config["timeout_seconds"]) #Allows website to be checked with max timeout of 5 sec
-    write_log(entry)
-    print_summary(entry)
+#Pull values from check website function + store in entry
+    timeout = config["timeout_seconds"]
+    for url in config["target_urls"]:
+        entry = check_website(url,timeout)
+        write_log(entry)
+        print_summary(entry)
 
 if __name__ == "__main__": #Run main function only if this specific file is executed
     main()

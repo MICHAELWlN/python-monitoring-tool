@@ -1,4 +1,8 @@
 {
-  "target_url": "https://example.com",
+  "target_urls": [
+   "https://example.com",
+   "https://httpbin.org/status/500",
+   "https:fake-website-that-does-not-exist12345"
+  ],
   "timeout_seconds": 5
 }

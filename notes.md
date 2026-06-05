@@ -74,3 +74,35 @@ Append mode adds a new line without deleting the old logs.
 
 JSON lines means each log entry is one JSON object on its own line.
 
+# Day 3 Notes
+
+Upgraded the tool from checking one website to checking multiple websites.
+
+config.json now stores:
+- target_urls = list of websites
+- timeout_seconds = max wait time for each check
+
+Python list:
+- stores multiple values together
+- target_urls is a list of website strings
+
+for loop:
+- repeats the same code for each URL
+- for url in config["target_urls"] gives one URL at a time
+
+main():
+- loads config
+- gets timeout_seconds
+- loops through target_urls
+- checks one url
+- writes each entry to logs/monitor.log
+- prints a summary for each URL
+
+Important distinction:
+- config["target_urls"] = the whole list
+- url = one website during the current loop
+
+Day 3 result:
+- one run checks multiple websiteds
+- each website creates one JSON log line
+- terminal shows one summary per website
