@@ -30,6 +30,9 @@ Support multiple target URLs from config.json
 
 The tool currently checks one URL per run. Day 3 should upgrade the config so it can store a list of target URLs, then use a 'for' loop in 'main()' to check each target, write each result to 'logs/monitor.log', and print a short summary for each check.
 
+## Day 4 Goal
+
+Add response_time_ms to every log entry
 
 ## Run
 

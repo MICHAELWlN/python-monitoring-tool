@@ -10,6 +10,7 @@ def load_config(): #Reads config settings
 def check_website(url, timeout): #Defines website check, allowed by main function
     try: #Attempts get request, checks website health with max timeout of 5 sec
         response = requests.get(url, timeout=timeout) 
+        response_seconds = response.elapsed.total_seconds() * 1000 #Log time in ms
 
         if response.status_code==200: #If response returns status code = 200 = healthy
             healthy = True
@@ -20,6 +21,7 @@ def check_website(url, timeout): #Defines website check, allowed by main functio
             "timestamp": datetime.now(timezone.utc).isoformat(),
             "target": url,
             "status_code": response.status_code,
+            "response_time": response_seconds,
             "healthy": healthy,
             "error": None
         }
@@ -32,6 +34,7 @@ def check_website(url, timeout): #Defines website check, allowed by main functio
             "timestamp": datetime.now(timezone.utc).isoformat(),
             "target": url,
             "status_code": None,
+            "response_time": None,
             "healthy": False,
             "error": str(error)
         }
