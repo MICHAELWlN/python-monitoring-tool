@@ -106,3 +106,37 @@ Day 3 result:
 - one run checks multiple websiteds
 - each website creates one JSON log line
 - terminal shows one summary per website
+
+# Day 4 Notes
+
+Added response time tracking to each website check.
+
+response.elapsed:
+- comes from the requests response object
+- shows how long the HTTP request took
+
+response.elapsed.total_seconds():
+- runs the total_seconds method
+- converts the elapsed time into seconds as a number
+
+response_time:
+- stores response time in milliseconds
+- calculated with response.elapsed.total_seconds() * 1000
+- added to each log entry
+
+Successful/unhealthy checks:
+- have a real status_code
+- have a real response_time
+- error is null
+
+Failed checks:
+- status_code is null
+- response_time is null
+- error stores the failure message
+
+Important distinction:
+- response_time = how long the website took to respond
+- timeout_seconds = max time the tool will wait before giving up
+
+Day 4 result:
+- logs now show website health and response speed
