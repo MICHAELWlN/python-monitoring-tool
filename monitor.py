@@ -10,7 +10,7 @@ def load_config(): #Reads config settings
 def check_website(url, timeout): #Defines website check, allowed by main function
     try: #Attempts get request, checks website health with max timeout of 5 sec
         response = requests.get(url, timeout=timeout) 
-        response_seconds = response.elapsed.total_seconds() * 1000 #Log time in ms
+        response_seconds_ms = response.elapsed.total_seconds() * 1000 #Log time in ms
 
         if response.status_code==200: #If response returns status code = 200 = healthy, if not = unhealthy
 
@@ -24,7 +24,7 @@ def check_website(url, timeout): #Defines website check, allowed by main functio
             "timestamp": datetime.now(timezone.utc).isoformat(),
             "target": url,
             "status_code": response.status_code,
-            "response_time": response_seconds,
+            "response_time_ms": response_seconds_ms,
             "result": result,
             "timeout_seconds": timeout,
             "error": None
@@ -40,7 +40,7 @@ def check_website(url, timeout): #Defines website check, allowed by main functio
             "timestamp": datetime.now(timezone.utc).isoformat(),
             "target": url,
             "status_code": None,
-            "response_time": None,
+            "response_time_ms": None,
             "result": result,
             "timeout_seconds": timeout,
             "error": str(error)
@@ -61,10 +61,17 @@ def write_log(entry):
 
 def main(): #controls program flow
     config = load_config() #Allows config to be read
-#Pull values from check website function + store in entry
+#Pull values from config + store in entry
     timeout = config["timeout_seconds"]
+    max_retries = config["max_retries"]
     for url in config["target_urls"]:
-        entry = check_website(url,timeout)
+        for attempt in range(max_retries +1):
+            entry = check_website(url, timeout)
+
+            if entry["result"] == "healthy":
+                break
+    
+        entry["attempts"] = attempt + 1
         write_log(entry)
         print_summary(entry)
 

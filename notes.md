@@ -109,7 +109,7 @@ Day 3 result:
 
 # Day 4 Notes
 
-Added response time tracking to each website check.
+Added timing, result labels, and retry attempts
 
 response.elapsed:
 - comes from the requests response object
@@ -134,9 +134,15 @@ Failed checks:
 - response_time is null
 - error stores the failure message
 
+Retry behavior:
+- healthy stops retryign early
+- unhealthy/failed retry until max_retries is used
+
 Important distinction:
 - response_time = how long the website took to respond
 - timeout_seconds = max time the tool will wait before giving up
+- check_website() handles one check
+- main() handles retries and adds attempts
 
 Day 4 result:
-- logs now show website health and response speed
+- logs now show website health, response speed, tool now performs basic retries

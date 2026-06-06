@@ -4,5 +4,6 @@
    "https://httpbin.org/status/500",
    "https:fake-website-that-does-not-exist12345"
   ],
-  "timeout_seconds": 5
+  "timeout_seconds": 5,
+  "max_retries": 2
 }
