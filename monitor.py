@@ -12,17 +12,21 @@ def check_website(url, timeout): #Defines website check, allowed by main functio
         response = requests.get(url, timeout=timeout) 
         response_seconds = response.elapsed.total_seconds() * 1000 #Log time in ms
 
-        if response.status_code==200: #If response returns status code = 200 = healthy
-            healthy = True
+        if response.status_code==200: #If response returns status code = 200 = healthy, if not = unhealthy
+
+            result = "healthy"
+        
         else:
-            healthy = False
+
+            result = "unhealthy"
 
         log_entry = {
             "timestamp": datetime.now(timezone.utc).isoformat(),
             "target": url,
             "status_code": response.status_code,
             "response_time": response_seconds,
-            "healthy": healthy,
+            "result": result,
+            "timeout_seconds": timeout,
             "error": None
         }
 
@@ -30,26 +34,23 @@ def check_website(url, timeout): #Defines website check, allowed by main functio
 
     except requests.RequestException as error: #Case of failure
 
+        result = "failed" #Variable for clean log entry use
+
         log_entry = {
             "timestamp": datetime.now(timezone.utc).isoformat(),
             "target": url,
             "status_code": None,
             "response_time": None,
-            "healthy": False,
+            "result": result,
+            "timeout_seconds": timeout,
             "error": str(error)
         }
     
         return log_entry
     
 def print_summary(entry):
-    if entry["error"] != None:
-        result = "failed"
-    elif entry["healthy"] == False:
-        result = "unhealthy"
-    else:
-        result = "healthy"
 
-    print("Checked", entry["target"], "-", result)
+    print("Checked", entry["target"], "-", entry["result"])
 
 def write_log(entry):
     with open("logs/monitor.log", "a") as file:

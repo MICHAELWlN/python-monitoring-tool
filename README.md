@@ -33,6 +33,24 @@ The tool currently checks one URL per run. Day 3 should upgrade the config so it
 ## Day 4 Goal
 
 Add response_time_ms to every log entry
+Polish response time tracking
+Polish log fields and simplify result handling
+
+The tool already calculates response time for successful and unhealthy checks. Day 4 should clean this up by making the log field name clear, testing all result types, and keeping the terminal output simple
+
+Required work:
+- Rename 'response_time' to 'response_time_ms'
+- Keep successful/unhealthy checks logging a real response time
+- Keep failed checks logging 'response_time_ms: null'
+- Test healthy, unhealthy, and failed URLs
+- Confirm logs/monitor.log gets one JSON line per website
+- Add a 'result' field with one of three values: 'healthy', 'unhealthy', or 'failed'
+- Update notes.md with a short Day 4 section
+
+Done when:
+- Each log entry clearly shows website health, response speed, result, and timeout setting
+- Terminal output stays short: 'Checked <url> - <result>'
+- Changes are committed and pushed to GitHub
 
 ## Run
 
