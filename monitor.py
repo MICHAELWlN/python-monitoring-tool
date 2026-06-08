@@ -1,92 +1,117 @@
-import json #Lets python read JSON file
-import requests #Allows get requests to be made
+import json
+import os
 from datetime import datetime, timezone
 
+import requests
 
-def load_config(): #Reads config settings
-    with open("config.json", "r") as file: #Opens config.json in read mode
-        return json.load(file) #Returns config settings
 
-def check_website(url, timeout): #Defines website check, allowed by main function
-    try: #Attempts get request, checks website health with max timeout of 5 sec
-        response = requests.get(url, timeout=timeout) 
-        response_seconds_ms = response.elapsed.total_seconds() * 1000 #Log time in ms
+def load_config():
+    """Load monitor settings from config.json."""
+    with open("config.json", "r") as file:
+        return json.load(file)
 
-        if response.status_code==200: #If response returns status code = 200 = healthy, if not = unhealthy
 
+def check_website(url, timeout):
+    """Run one HTTP check and return one structured log entry."""
+    try:
+        response = requests.get(url, timeout=timeout)
+        response_time_ms = response.elapsed.total_seconds() * 1000
+
+        if response.status_code == 200:
             result = "healthy"
-        
         else:
-
             result = "unhealthy"
 
         log_entry = {
             "timestamp": datetime.now(timezone.utc).isoformat(),
             "target": url,
             "status_code": response.status_code,
-            "response_time_ms": response_seconds_ms,
+            "response_time_ms": response_time_ms,
             "result": result,
             "timeout_seconds": timeout,
-            "error": None
+            "error": None,
         }
 
         return log_entry
 
-    except requests.RequestException as error: #Case of failure
-
-        result = "failed" #Variable for clean log entry use
-
+    except requests.RequestException as error:
         log_entry = {
             "timestamp": datetime.now(timezone.utc).isoformat(),
             "target": url,
             "status_code": None,
             "response_time_ms": None,
-            "result": result,
+            "result": "failed",
             "timeout_seconds": timeout,
-            "error": str(error)
+            "error": str(error),
         }
-    
+
         return log_entry
-    
+
+
 def print_summary(entry):
-    if entry["alert"] == True:
+    """Print one short human-readable summary for a final log entry."""
+    if entry["alert"]:
         print("Checked", entry["target"], "-", entry["result"], "ALERT")
     else:
         print("Checked", entry["target"], "-", entry["result"])
 
-   
 
 def write_log(entry):
+    """Append one structured JSON log entry to logs/monitor.log."""
+    os.makedirs("logs", exist_ok=True)
+
     with open("logs/monitor.log", "a") as file:
         file.write(json.dumps(entry) + "\n")
 
 
+def main():
+    """Control the full monitoring run."""
+    config = load_config()
 
-
-def main(): #controls program flow
-    config = load_config() #Allows config to be read
-#Pull values from config + store in entry
     timeout = config["timeout_seconds"]
     max_retries = config["max_retries"]
+
+    total_checked = 0
+    total_healthy = 0
+    total_alert = 0
+
     for url in config["target_urls"]:
-        for attempt in range(max_retries +1):
+        for attempt in range(max_retries + 1):
             entry = check_website(url, timeout)
 
             if entry["result"] == "healthy":
                 break
-    
+
         entry["attempts"] = attempt + 1
+
         if entry["result"] == "healthy":
-            alert = False
-            alert_reason = None
+            entry["alert"] = False
+            entry["alert_reason"] = None
         else:
-            alert = True
-            alert_reason = "non_healthy_after_retries"
-        entry["alert"] = alert
-        entry["alert_reason"] = alert_reason
+            entry["alert"] = True
+            entry["alert_reason"] = "non_healthy_after_retries"
 
         write_log(entry)
         print_summary(entry)
 
-if __name__ == "__main__": #Run main function only if this specific file is executed
+        total_checked += 1
+
+        if entry["result"] == "healthy":
+            total_healthy += 1
+
+        if entry["alert"]:
+            total_alert += 1
+
+    print(
+        "Summary:",
+        total_checked,
+        "checked |",
+        total_alert,
+        "alerts |",
+        total_healthy,
+        "healthy",
+    )
+
+
+if __name__ == "__main__":
     main()

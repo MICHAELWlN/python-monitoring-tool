@@ -149,23 +149,27 @@ Day 4 result:
 
 # Day 5 Notes
 
-Added basic alert logic after retries.
+Added alert logic and a final run summary.
 
 New fields:
-- alert = true or false
-- alert_reason = why the alert triggered, or null
+- alert = true/false decision after retries
+- alert_reason = reason for alert, or null
 
 Alert behavior:
-- healthy = alert false
-- unhealthy = alert true
-- failed = alert true
+- healthy = no alert
+- unhealthy/failed = alert after retries
+- terminal shows ALERT when alert is true
+
+Run summary:
+- total_checked = number of URLs checked
+- total_alert = number of alerting results
+- total_healthy = number of healthy results
 
 Important distinction:
-- result = what happened
-- alert = whether it needs attention
-- main() decides alert after retries are finished
+- print_summary() prints one URL result
+- main() tracks totals across the full run
+- counters must start before the URL loop so they do not reset
 
 Day 5 result:
-- healthy checks do not alert
-- unhealthy/failed checks alert after retries
-- terminal shows ALERT when alert is true
+- each URL gets alert fields in the log
+- terminal shows per-URL status plus final totals

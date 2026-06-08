@@ -68,6 +68,7 @@ Required work:
 - Set 'alert' to 'false' when result is 'healthy'
 - Set 'alert' to 'true' when result is 'unhealthy' or 'failed' after retries are used
 - Add an 'alert_reason' field with a short reason such as 'non_healthy_after_retries'
+- Add a final run summary showing total URLs checked, healthy count, and alert count
 - Keep terminal output short, but include alert status when needed
 - Test healthy, unhealthy, and failed URLs
 - Update notes.md with a short Day 5 section
@@ -76,17 +77,43 @@ Done when:
 - Healthy checks log 'alert: false'
 - Unhealthy or failed checks log 'alert: true'
 - logs/monitor.log shows 'result', 'attempts', 'alert' and 'alert_reason'
+- Terminal prints a final summary such as '3 checked | 1 alert | 2 healthy
 - Terminal output stays readable
 - Changes are committed and pushed to GitHub
 
-## Run
+## Linux Run / Debug Commands
+
+Create and activate a virtual environment:
 
 ```zsh
 python3 -m venv .venv
 source .venv/bin/activate
+
+## Install Dependencies:
+
 pip install -r requirements.txt
-python monitor.py
-```
+
+## Run the Monitor:
+
+python3 monitor.py
+
+## Watch logs live:
+
+tail -f logs/monitor.log
+
+## Show only failed checks:
+
+grep '"result": "failed"' logs/monitor.log
+
+## Check the config file:
+
+cat config.json
+
+## Why this helps:
+
+tail -f = watch logs as they are written
+grep = filter logs for useful patterns
+cat = quicly inspect config
 
 ## Logs
 
