@@ -57,6 +57,28 @@ Done when:
 - Unhealthy or failed checks log the total attempts used
 - Changes are committed and pushed to GitHub
 
+## Day 5 Goal
+
+Add basic alert logic after retries
+
+The tool already retries unhealthy or failed checks. Day 5 should add a simple alert decision after all attempts are finished, so the final log entry clearly shows whether the result should trigger attention
+
+Required work:
+- Add an 'alert' field to the final log entry
+- Set 'alert' to 'false' when result is 'healthy'
+- Set 'alert' to 'true' when result is 'unhealthy' or 'failed' after retries are used
+- Add an 'alert_reason' field with a short reason such as 'non_healthy_after_retries'
+- Keep terminal output short, but include alert status when needed
+- Test healthy, unhealthy, and failed URLs
+- Update notes.md with a short Day 5 section
+
+Done when:
+- Healthy checks log 'alert: false'
+- Unhealthy or failed checks log 'alert: true'
+- logs/monitor.log shows 'result', 'attempts', 'alert' and 'alert_reason'
+- Terminal output stays readable
+- Changes are committed and pushed to GitHub
+
 ## Run
 
 ```zsh

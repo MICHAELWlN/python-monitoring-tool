@@ -146,3 +146,26 @@ Important distinction:
 
 Day 4 result:
 - logs now show website health, response speed, tool now performs basic retries
+
+# Day 5 Notes
+
+Added basic alert logic after retries.
+
+New fields:
+- alert = true or false
+- alert_reason = why the alert triggered, or null
+
+Alert behavior:
+- healthy = alert false
+- unhealthy = alert true
+- failed = alert true
+
+Important distinction:
+- result = what happened
+- alert = whether it needs attention
+- main() decides alert after retries are finished
+
+Day 5 result:
+- healthy checks do not alert
+- unhealthy/failed checks alert after retries
+- terminal shows ALERT when alert is true

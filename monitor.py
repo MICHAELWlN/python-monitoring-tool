@@ -49,8 +49,12 @@ def check_website(url, timeout): #Defines website check, allowed by main functio
         return log_entry
     
 def print_summary(entry):
+    if entry["alert"] == True:
+        print("Checked", entry["target"], "-", entry["result"], "ALERT")
+    else:
+        print("Checked", entry["target"], "-", entry["result"])
 
-    print("Checked", entry["target"], "-", entry["result"])
+   
 
 def write_log(entry):
     with open("logs/monitor.log", "a") as file:
@@ -72,6 +76,15 @@ def main(): #controls program flow
                 break
     
         entry["attempts"] = attempt + 1
+        if entry["result"] == "healthy":
+            alert = False
+            alert_reason = None
+        else:
+            alert = True
+            alert_reason = "non_healthy_after_retries"
+        entry["alert"] = alert
+        entry["alert_reason"] = alert_reason
+
         write_log(entry)
         print_summary(entry)
 
