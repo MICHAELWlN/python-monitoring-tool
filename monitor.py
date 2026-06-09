@@ -10,6 +10,18 @@ def load_config():
     with open("config.json", "r") as file:
         return json.load(file)
 
+def validate_config(config):
+    """Validate required config settings before the monitor runs."""
+    required_keys = ["target_urls", "timeout_seconds", "max_retries"]
+    missing_keys = []
+
+    for key in required_keys:
+        if key not in config:
+            missing_keys.append(key)
+
+    if missing_keys:
+        raise ValueError("Missing required config settings: " + ", ".join(missing_keys))
+
 
 def check_website(url, timeout):
     """Run one HTTP check and return one structured log entry."""
@@ -67,6 +79,7 @@ def write_log(entry):
 def main():
     """Control the full monitoring run."""
     config = load_config()
+    validate_config(config)
 
     timeout = config["timeout_seconds"]
     max_retries = config["max_retries"]
