@@ -81,6 +81,34 @@ Done when:
 - Terminal output stays readable
 - Changes are committed and pushed to GitHub
 
+## Day 6 Goal
+
+Finish the project as a clean SRE-style automation repo.
+
+The tool already checks multiple websites, retries non-healthy results, writes JSON logs, tracks alerts, and prints. a final run summary. Day 6 should focus on making the project clean, Linux-friendly, and ready to show on GitHub.
+
+Required work:
+- Make sure the logs folder auto-creates if missing
+- Add basic config validation for required settings: target_urls, timeout_seconds, and max_retries
+- Keep terminal output readable and short
+- Keep logs/monitor.log as JSON lines
+- Add or confirm .gitignore excludes runtime logs
+- Clean README formatting and Linux run/debug commands
+- Update notes.md with final Day 6 notes
+- Run a final healthy, unhealthy, and failed URL test
+
+Done when:
+- The tool runs cleanly from a fresh terminal session
+- Missing logs/ folder gets recreated automatically
+- Bad or missing config keys show a readable error
+- logs/monitor.log gets one JSON line per website
+- Terminal shows per-URL output plus final run summary
+README explains how to run and debug the tool on Linux
+- Changes are committed and pushed to GitHub
+
+Stretch only if time remains:
+- Add a short systemd timer example showing how the monitor could run every 5 minutes on Linux
+
 ## Linux Run / Debug Commands
 
 Create and activate a virtual environment:
