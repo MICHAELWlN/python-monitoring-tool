@@ -1,152 +1,161 @@
 # Python Monitoring and Troubleshooting Tool
 
-This is an in-progress Python tool for checking basic website/service health.
+A Linux-friendly Python monitoring tool that checks website health, retries non-healthy results, writes structured JSON logs, and prints readable terminal summaries.
 
-## Day 1 Goal
+## Features
 
-Create the repository and make the first working HTTP check.
+- Loads monitor settings from `config.json`
+- Validates required config settings before running
+- Checks multiple target URLs
+- Uses `timeout_seconds` to prevent hanging requests
+- Measures response time in milliseconds
+- Classifies results as `healthy`, `unhealthy`, or `failed`
+- Retries unhealthy/failed checks with `max_retries`
+- Adds `attempts`, `alert`, and `alert_reason` to final log entries
+- Writes JSON lines to `logs/monitor.log`
+- Auto-creates the `logs/` folder if missing
+- Prints one summary per URL plus a final run summary
 
-## Day 2 Goal
+## Project Structure
 
-Add structured JSON logging so each website check is saved to a log file.
+```text
+python-monitoring-tool/
+├── config.json
+├── monitor.py
+├── notes.md
+├── requirements.txt
+├── README.md
+└── logs/
+    └── .gitkeep
+```
 
-Current features:
-- Loads target settings from config.json
-- Checks a URL using HTTP
-- Reports status code
-- Handles request errors with try/except
-- Writes each check result as JSON to logs/monitor.log
-- Logs timestamp, target URL, status code, health result, and errors
+Runtime log files are ignored by Git.
 
-Planned features:
-- Repeated failure detection
-- Alert cooldown logic
-- Multiple targets
-- Troubleshooting output
+## Example Config
 
-## Day 3 Goal
+```json
+{
+  "target_urls": [
+    "https://example.com",
+    "https://httpbin.org/status/500",
+    "https://fake-website-that-does-not-exist12345.com"
+  ],
+  "timeout_seconds": 10,
+  "max_retries": 2
+}
+```
 
-Support multiple target URLs from config.json
-
-The tool currently checks one URL per run. Day 3 should upgrade the config so it can store a list of target URLs, then use a 'for' loop in 'main()' to check each target, write each result to 'logs/monitor.log', and print a short summary for each check.
-
-## Day 4 Goal
-
-Add response_time_ms to every log entry
-Polish response time tracking
-Polish log fields and simplify result handling
-Add basic retry tracking
-
-The tool already calculates response time for successful and unhealthy checks. Day 4 should clean this up by making the log field name clear, testing all result types, retry unhealthy or failed checks before writing the final log entry, and keeping the terminal output simple
-
-Required work:
-- Rename 'response_time' to 'response_time_ms'
-- Keep successful/unhealthy checks logging a real response time
-- Keep failed checks logging 'response_time_ms: null'
-- Test healthy, unhealthy, and failed URLs
-- Confirm logs/monitor.log gets one JSON line per website
-- Add a 'result' field with one of three values: 'healthy', 'unhealthy', or 'failed'
-- Retry unhealthy or failed checks up to 'max_retries'
-- Stop retrying early if a check becomes 'healthy'
-- Add 'attempts' to the final log entry
-- Update notes.md with a short Day 4 section
-
-Done when:
-- Each log entry clearly shows website health, response speed, result, and timeout setting
-- Terminal output stays short: 'Checked <url> - <result>'
-- Unhealthy or failed checks log the total attempts used
-- Changes are committed and pushed to GitHub
-
-## Day 5 Goal
-
-Add basic alert logic after retries
-
-The tool already retries unhealthy or failed checks. Day 5 should add a simple alert decision after all attempts are finished, so the final log entry clearly shows whether the result should trigger attention
-
-Required work:
-- Add an 'alert' field to the final log entry
-- Set 'alert' to 'false' when result is 'healthy'
-- Set 'alert' to 'true' when result is 'unhealthy' or 'failed' after retries are used
-- Add an 'alert_reason' field with a short reason such as 'non_healthy_after_retries'
-- Add a final run summary showing total URLs checked, healthy count, and alert count
-- Keep terminal output short, but include alert status when needed
-- Test healthy, unhealthy, and failed URLs
-- Update notes.md with a short Day 5 section
-
-Done when:
-- Healthy checks log 'alert: false'
-- Unhealthy or failed checks log 'alert: true'
-- logs/monitor.log shows 'result', 'attempts', 'alert' and 'alert_reason'
-- Terminal prints a final summary such as '3 checked | 1 alert | 2 healthy
-- Terminal output stays readable
-- Changes are committed and pushed to GitHub
-
-## Day 6 Goal
-
-Finish the project as a clean SRE-style automation repo.
-
-The tool already checks multiple websites, retries non-healthy results, writes JSON logs, tracks alerts, and prints. a final run summary. Day 6 should focus on making the project clean, Linux-friendly, and ready to show on GitHub.
-
-Required work:
-- Make sure the logs folder auto-creates if missing
-- Add basic config validation for required settings: target_urls, timeout_seconds, and max_retries
-- Keep terminal output readable and short
-- Keep logs/monitor.log as JSON lines
-- Add or confirm .gitignore excludes runtime logs
-- Clean README formatting and Linux run/debug commands
-- Update notes.md with final Day 6 notes
-- Run a final healthy, unhealthy, and failed URL test
-
-Done when:
-- The tool runs cleanly from a fresh terminal session
-- Missing logs/ folder gets recreated automatically
-- Bad or missing config keys show a readable error
-- logs/monitor.log gets one JSON line per website
-- Terminal shows per-URL output plus final run summary
-README explains how to run and debug the tool on Linux
-- Changes are committed and pushed to GitHub
-
-Stretch only if time remains:
-- Add a short systemd timer example showing how the monitor could run every 5 minutes on Linux
-
-## Linux Run / Debug Commands
+## Run
 
 Create and activate a virtual environment:
 
 ```zsh
 python3 -m venv .venv
 source .venv/bin/activate
+```
 
-## Install Dependencies:
+Install dependencies:
 
+```zsh
 pip install -r requirements.txt
+```
 
-## Run the Monitor:
+Run the monitor:
 
+```zsh
 python3 monitor.py
+```
 
-## Watch logs live:
+## Example Terminal Output
 
-tail -f logs/monitor.log
+```text
+Checked https://example.com - healthy
+Checked https://httpbin.org/status/500 - unhealthy ALERT
+Checked https://fake-website-that-does-not-exist12345.com - failed ALERT
+Summary: 3 checked | 2 alerts | 1 healthy
+```
 
-## Show only failed checks:
+## Log Output
 
-grep '"result": "failed"' logs/monitor.log
-
-## Check the config file:
-
-cat config.json
-
-## Why this helps:
-
-tail -f = watch logs as they are written
-grep = filter logs for useful patterns
-cat = quicly inspect config
-
-## Logs
-
-Each run appends one JSON object to:
+Each run appends one JSON object per website to:
 
 ```text
 logs/monitor.log
 ```
+
+Example log entry:
+
+```json
+{
+  "timestamp": "2026-06-09T06:30:00.000000+00:00",
+  "target": "https://example.com",
+  "status_code": 200,
+  "response_time_ms": 123.45,
+  "result": "healthy",
+  "timeout_seconds": 10,
+  "error": null,
+  "attempts": 1,
+  "alert": false,
+  "alert_reason": null
+}
+```
+
+## Result Types
+
+- `healthy` = website responded with HTTP 200
+- `unhealthy` = website responded, but not with HTTP 200
+- `failed` = request broke before getting a valid response
+
+## Alert Behavior
+
+- Healthy checks do not alert
+- Unhealthy or failed checks alert after retries finish
+- Alerting results include `alert: true`
+- Non-alerting results include `alert: false`
+
+## Linux Run / Debug Commands
+
+Watch logs live:
+
+```zsh
+tail -f logs/monitor.log
+```
+
+Show alerting checks:
+
+```zsh
+grep '"alert": true' logs/monitor.log
+```
+
+Show failed checks:
+
+```zsh
+grep '"result": "failed"' logs/monitor.log
+```
+
+Check the config file:
+
+```zsh
+cat config.json
+```
+
+Delete logs and verify they auto-create:
+
+```zsh
+rm -rf logs
+python3 monitor.py
+ls logs
+tail -n 3 logs/monitor.log
+```
+
+## What This Project Demonstrates
+
+- Python scripting
+- Config-driven automation
+- HTTP health checks
+- Structured JSON logging
+- Retry logic
+- Alert decision logic
+- Basic config validation
+- Linux-style log inspection
+- Operational troubleshooting workflow
